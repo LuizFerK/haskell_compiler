@@ -1,6 +1,7 @@
 module Interpreter where
 
 import Lexer
+import Debug.Trace
 
 subst :: String -> Expr -> Expr -> Expr 
 subst x n b@(Var v) = if v == x then 
@@ -9,6 +10,7 @@ subst x n b@(Var v) = if v == x then
                         b 
 subst x n (Lam v t b) = Lam v t (subst x n b)
 subst x n (App e1 e2) = App (subst x n e1) (subst x n e2)
+subst x n (Let v f b) = Let v (subst x n f) (subst x n b)
 subst x n (Add e1 e2) = Add (subst x n e1) (subst x n e2)
 subst x n (And e1 e2) = And (subst x n e1) (subst x n e2)
 subst x n (If e e1 e2) = If (subst x n e) (subst x n e1) (subst x n e2)
@@ -48,6 +50,7 @@ step (App e1@(Lam x t b) e2) | isvalue e2 = Just (subst x e2 b)
 step (App e1 e2) = case step e1 of 
                      Just e1' -> Just (App e1' e2)
                      _        -> Nothing
+step (Let v f b) = step (subst v f b)
 step (Paren e) = Just e
 step (Eq e1 e2) | isvalue e1 && isvalue e2 = if (e1 == e2) then
                                                Just BTrue 

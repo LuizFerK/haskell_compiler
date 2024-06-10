@@ -26,6 +26,9 @@ import Lexer
     ')'         { TokenRParen }
     Bool        { TokenBoolean }
     Number      { TokenNumber }
+    let         { TokenLet }
+    '='         { TokenAssign }
+    in          { TokenIn }
 
 %nonassoc if then else
 %left '+' '-'
@@ -35,21 +38,35 @@ import Lexer
 
 %% 
 
-Exp     : num                        { Num $1 }
-        | var                        { Var $1 }
-        | false                      { BFalse }
-        | true                       { BTrue }
-        | Exp '+' Exp                { Add $1 $3 }
-        | Exp "&&" Exp               { And $1 $3 }
-        | if Exp then Exp else Exp   { If $2 $4 $6 }
-        | '\\' var ':' Type "->" Exp { Lam $2 $4 $6 }
-        | Exp Exp                    { App $1 $2 }
-        | '(' Exp ')'                { Paren $2 }
-        | Exp "==" Exp               { Eq $1 $3 }
+-- Exp     : num                             { Num $1 }
+--         | var                             { Var $1 }
+--         | mintira                           { BFalse }
+--         | verdadi                            { BTrue }
+--         | Exp '+' Exp                     { Add $1 $3 }
+--         | Exp "&&" Exp                    { And $1 $3 }
+--         | ese Exp entao Exp senao Exp        { If $2 $4 $6 }
+--         | '\\' var ':' Type "->" Exp      { Lam $2 $4 $6 }
+--         | Exp Exp                         { App $1 $2 }
+--         | '(' Exp ')'                     { Paren $2 }
+--         | Exp "==" Exp                    { Eq $1 $3 }
+--         | declara var '=' Exp em Exp          { Let $2 $4 $6 }
 
-Type    : Bool                       { TBool }
-        | Number                     { TNum }
-        | '(' Type "->" Type ')'     { TFun $2 $4 }
+Exp     : num                             { Num $1 }
+        | var                             { Var $1 }
+        | false                           { BFalse }
+        | true                            { BTrue }
+        | Exp '+' Exp                     { Add $1 $3 }
+        | Exp "&&" Exp                    { And $1 $3 }
+        | if Exp then Exp else Exp        { If $2 $4 $6 }
+        | '\\' var ':' Type "->" Exp      { Lam $2 $4 $6 }
+        | Exp Exp                         { App $1 $2 }
+        | '(' Exp ')'                     { Paren $2 }
+        | Exp "==" Exp                    { Eq $1 $3 }
+        | let var '=' Exp in Exp          { Let $2 $4 $6 }
+
+Type    : Bool                            { TBool }
+        | Number                          { TNum }
+        | '(' Type "->" Type ')'          { TFun $2 $4 }
 
 
 { 

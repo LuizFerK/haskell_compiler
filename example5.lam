@@ -1,0 +1,10 @@
+let fun = \x: Number ->
+  if x == 10 then
+    x
+  else
+    fun (x + 1)
+in
+
+let h = 3 in
+
+fun h
