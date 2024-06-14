@@ -11,6 +11,9 @@ typeof _ (Num _) = Just TNum
 typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                            (Just TNum, Just TNum) -> Just TNum
                            _                       -> Nothing 
+typeof ctx (Times e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                           (Just TNum, Just TNum) -> Just TNum
+                           _                       -> Nothing 
 typeof ctx (And e1 e2) = case (typeof ctx e1, typeof ctx  e2) of 
                            (Just TBool, Just TBool) -> Just TBool 
                            _                         -> Nothing
@@ -44,6 +47,9 @@ typeof ctx (Eq e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                           _                  -> Nothing
 typeof ctx (Gt e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                           (Just TNum, Just TNum) -> Just TBool
+                          _                  -> Nothing
+typeof ctx (Mod e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                          (Just TNum, Just TNum) -> Just TNum
                           _                  -> Nothing
 typeof ctx (Paren e) = typeof ctx e 
 

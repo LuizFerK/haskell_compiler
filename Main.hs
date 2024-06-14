@@ -5,4 +5,4 @@ import Parser
 import TypeChecker
 import Interpreter 
 
-main = getContents >>= print . eval . parser . lexer
+main = getContents >>= print . (\x -> eval [] x) . parser . lexer

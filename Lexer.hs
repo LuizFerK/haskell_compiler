@@ -10,6 +10,7 @@ data Ty = TBool
 data Expr = BTrue
           | BFalse
           | Num Int 
+          | Times Expr Expr
           | Add Expr Expr 
           | And Expr Expr 
           | If Expr Expr Expr 
@@ -19,6 +20,7 @@ data Expr = BTrue
           | Paren Expr
           | Eq Expr Expr
           | Gt Expr Expr
+          | Mod Expr Expr
           | Let String Expr Expr
           | LetRec String Expr Expr
           deriving (Show, Eq)
@@ -26,7 +28,8 @@ data Expr = BTrue
 data Token = TokenTrue 
            | TokenFalse 
            | TokenNum Int 
-           | TokenAdd 
+           | TokenTimes
+           | TokenAdd
            | TokenAnd
            | TokenIf 
            | TokenThen
@@ -41,6 +44,7 @@ data Token = TokenTrue
            | TokenNumber
            | TokenEq
            | TokenGt
+           | TokenMod
            | TokenLetRec
            | TokenLet
            | TokenAssign
@@ -52,8 +56,10 @@ isToken c = elem c "->&|="
 
 lexer :: String -> [Token]
 lexer [] = []
+lexer ('*':cs) = TokenTimes : lexer cs
 lexer ('+':cs) = TokenAdd : lexer cs
 lexer ('>':cs) = TokenGt : lexer cs
+lexer ('%':cs) = TokenMod : lexer cs
 lexer ('\\':cs) = TokenLam : lexer cs
 lexer (':':cs) = TokenColon : lexer cs
 lexer ('(':cs) = TokenLParen : lexer cs
