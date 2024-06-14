@@ -1,5 +1,5 @@
 letrec fun = \x: Number ->
-  if x == 10 then
+  if x > 10 then
     x
   else
     fun (x + 3)
@@ -7,4 +7,4 @@ in
 
 let h = 1 in
 
-fun h
+(fun 1) + 3

@@ -13,6 +13,7 @@ import Lexer
     '+'         { TokenAdd }
     "&&"        { TokenAnd }
     "=="        { TokenEq }
+    '>'         { TokenGt }
     true        { TokenTrue }
     false       { TokenFalse }
     if          { TokenIf }
@@ -26,6 +27,7 @@ import Lexer
     ')'         { TokenRParen }
     Bool        { TokenBoolean }
     Number      { TokenNumber }
+    letrec      { TokenLetRec }
     let         { TokenLet }
     '='         { TokenAssign }
     in          { TokenIn }
@@ -62,7 +64,9 @@ Exp     : num                             { Num $1 }
         | Exp Exp                         { App $1 $2 }
         | '(' Exp ')'                     { Paren $2 }
         | Exp "==" Exp                    { Eq $1 $3 }
+        | Exp '>' Exp                     { Gt $1 $3 }
         | let var '=' Exp in Exp          { Let $2 $4 $6 }
+        | letrec var '=' Exp in Exp       { LetRec $2 $4 $6 }
 
 Type    : Bool                            { TBool }
         | Number                          { TNum }

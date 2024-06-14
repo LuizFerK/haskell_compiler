@@ -23,10 +23,12 @@ typeof ctx (If e e1 e2) =
                                               Nothing
                       _                  -> Nothing 
       _          -> Nothing
-typeof ctx (Var v) = lookup v ctx 
-typeof ctx (Lam v t1 b) = let Just t2 = typeof ((v, t1):ctx) b 
+typeof ctx (Var v) = lookup v ctx
+typeof ctx (Lam v t1 b) = let Just t2 = typeof ((v, t1):ctx) b
                             in Just (TFun t1 t2)
 typeof ctx (Let v f b) = let Just t1 = typeof ctx f
+                           in typeof ((v, t1):ctx) b
+typeof ctx (LetRec v f b) = let Just t1 = typeof ctx f
                            in typeof ((v, t1):ctx) b
 typeof ctx (App t1 t2) = case (typeof ctx t1, typeof ctx t2) of 
                            (Just (TFun t11 t12), Just t2) -> if (t11 == t2) then 
@@ -39,6 +41,9 @@ typeof ctx (Eq e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                                                   Just TBool
                                                 else 
                                                   Nothing
+                          _                  -> Nothing
+typeof ctx (Gt e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                          (Just TNum, Just TNum) -> Just TBool
                           _                  -> Nothing
 typeof ctx (Paren e) = typeof ctx e 
 

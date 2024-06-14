@@ -18,7 +18,9 @@ data Expr = BTrue
           | App Expr Expr 
           | Paren Expr
           | Eq Expr Expr
+          | Gt Expr Expr
           | Let String Expr Expr
+          | LetRec String Expr Expr
           deriving (Show, Eq)
 
 data Token = TokenTrue 
@@ -38,6 +40,8 @@ data Token = TokenTrue
            | TokenBoolean
            | TokenNumber
            | TokenEq
+           | TokenGt
+           | TokenLetRec
            | TokenLet
            | TokenAssign
            | TokenIn
@@ -47,13 +51,14 @@ isToken :: Char -> Bool
 isToken c = elem c "->&|="
 
 lexer :: String -> [Token]
-lexer [] = [] 
-lexer ('+':cs) = TokenAdd : lexer cs 
+lexer [] = []
+lexer ('+':cs) = TokenAdd : lexer cs
+lexer ('>':cs) = TokenGt : lexer cs
 lexer ('\\':cs) = TokenLam : lexer cs
 lexer (':':cs) = TokenColon : lexer cs
 lexer ('(':cs) = TokenLParen : lexer cs
 lexer (')':cs) = TokenRParen : lexer cs
-lexer (c:cs) | isSpace c = lexer cs 
+lexer (c:cs) | isSpace c = lexer cs
              | isDigit c = lexNum (c:cs)
              | isAlpha c = lexKW (c:cs)
              | isToken c = lexSymbol (c:cs)
@@ -72,6 +77,7 @@ lexKW cs = case span isAlpha cs of
              ("else", rest)  -> TokenElse : lexer rest 
              ("Bool", rest)  -> TokenBoolean : lexer rest 
              ("Number", rest)  -> TokenNumber : lexer rest 
+             ("letrec", rest)  -> TokenLetRec : lexer rest 
              ("let", rest)  -> TokenLet : lexer rest 
              ("in", rest)  -> TokenIn : lexer rest 
              (var, rest)     -> TokenVar var : lexer rest 

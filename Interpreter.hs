@@ -11,11 +11,13 @@ subst x n b@(Var v) = if v == x then
 subst x n (Lam v t b) = Lam v t (subst x n b)
 subst x n (App e1 e2) = App (subst x n e1) (subst x n e2)
 subst x n (Let v f b) = Let v (subst x n f) (subst x n b)
+subst x n (LetRec v f b) = LetRec v (subst x n f) (subst x n b)
 subst x n (Add e1 e2) = Add (subst x n e1) (subst x n e2)
 subst x n (And e1 e2) = And (subst x n e1) (subst x n e2)
 subst x n (If e e1 e2) = If (subst x n e) (subst x n e1) (subst x n e2)
 subst x n (Paren e) = Paren (subst x n e)
 subst x n (Eq e1 e2) = Eq (subst x n e1) (subst x n e2)
+subst x n (Gt e1 e2) = Gt (subst x n e1) (subst x n e2)
 subst x n e = e 
 
 isvalue :: Expr -> Bool 
@@ -51,8 +53,23 @@ step (App e1 e2) = case step e1 of
                      Just e1' -> Just (App e1' e2)
                      _        -> Nothing
 step (Let v f b) = step (subst v f b)
+step (LetRec v f b@(App (Var _) _)) = Just (LetRec v f (let Just x = step (subst v f b) in x))
+step (LetRec v f b) | isvalue b = Just b
+                    | otherwise = let Just sb = step b in step (LetRec v f sb)
 step (Paren e) = Just e
 step (Eq e1 e2) | isvalue e1 && isvalue e2 = if (e1 == e2) then
+                                               Just BTrue 
+                                             else 
+                                               Just BFalse 
+                | isvalue e1 = case step e2 of 
+                                 Just e2' -> Just (Eq e1 e2')
+                                 _        -> Nothing
+                | otherwise = case step e1 of 
+                                Just e1' -> Just (Eq e1' e2)
+                                _        -> Nothing 
+step (Gt e1 e2) | isvalue e1 && isvalue e2 = let (Num n1) = e1
+                                                 (Num n2) = e2
+                                            in if (n1 > n2) then
                                                Just BTrue 
                                              else 
                                                Just BFalse 
